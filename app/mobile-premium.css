@@ -1,0 +1,671 @@
+/* 21K Progress — premium iPhone layer
+   Mobile-first visual redesign approved from the dark iPhone concept.
+   Desktop remains governed by globals.css. */
+
+@media (max-width: 760px) {
+  :root,
+  .dark {
+    --bg: #050b14;
+    --panel: #0b1422;
+    --text: #f7f9ff;
+    --muted: #91a0b7;
+    --line: rgba(145, 160, 183, 0.16);
+    --blue: #4f7cff;
+    --green: #2ee879;
+    --orange: #ff9b38;
+    --violet: #9a66ff;
+    --gray: #6f7e94;
+    --danger: #ff5f68;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    --radius: 24px;
+  }
+
+  html {
+    background: #050b14;
+    color-scheme: dark;
+  }
+
+  body {
+    min-height: 100svh;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 72% -8%, rgba(51, 91, 255, 0.22), transparent 32rem),
+      radial-gradient(circle at -15% 24%, rgba(33, 105, 218, 0.12), transparent 24rem),
+      linear-gradient(180deg, #050a12 0%, #07111d 44%, #050b14 100%);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-shell {
+    display: block;
+    min-height: 100svh;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    width: min(100%, 520px);
+    margin: 0 auto;
+    padding:
+      max(18px, env(safe-area-inset-top))
+      16px
+      calc(112px + env(safe-area-inset-bottom));
+  }
+
+  /* Mobile header */
+  .topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 0 0 18px;
+    min-height: 68px;
+  }
+
+  .topbar > div:first-child {
+    min-width: 0;
+  }
+
+  .topbar h1 {
+    margin: 0;
+    font-size: 0;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .topbar h1::after {
+    content: "21K Progress";
+    display: block;
+    font-size: 30px;
+    font-weight: 950;
+    letter-spacing: -0.055em;
+    background: linear-gradient(100deg, #4f7cff 0%, #895dff 29%, #ffffff 31%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .topbar > div:first-child::after {
+    content: "Tu camino hacia los 21,1 km";
+    display: block;
+    margin-top: 8px;
+    color: #a9b4c5;
+    font-size: 14px;
+    font-weight: 550;
+    letter-spacing: -0.01em;
+  }
+
+  .topbar p {
+    display: none;
+  }
+
+  .topbar .actions {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .topbar .actions .btn:not(.primary) {
+    display: none;
+  }
+
+  .topbar .btn.primary {
+    width: 54px;
+    min-width: 54px;
+    height: 54px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(130, 147, 255, 0.46);
+    border-radius: 18px;
+    font-size: 0;
+    color: #fff;
+    background: linear-gradient(145deg, #2f74ff, #6f55ff);
+    box-shadow:
+      0 12px 28px rgba(57, 91, 255, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+
+  .topbar .btn.primary svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.2;
+  }
+
+  /* Cloud/demo status is intentionally quiet on mobile */
+  .auth-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    margin: -2px 0 18px;
+    padding: 9px 12px;
+    border: 1px solid rgba(90, 123, 197, 0.16);
+    border-radius: 15px;
+    background: rgba(12, 24, 41, 0.56);
+    box-shadow: none;
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+  }
+
+  .auth-banner > div:first-child {
+    min-width: 0;
+  }
+
+  .auth-banner b {
+    color: #dce5f4;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .auth-banner .tiny {
+    display: none;
+  }
+
+  .auth-banner .actions {
+    margin-left: auto;
+    gap: 7px;
+  }
+
+  .auth-banner input {
+    min-width: 0;
+    width: 148px;
+    height: 36px;
+    padding: 7px 10px;
+    font-size: 12px;
+    border-radius: 11px;
+    background: rgba(5, 12, 22, 0.86);
+  }
+
+  .auth-banner .btn {
+    min-height: 36px;
+    padding: 7px 10px;
+    border-radius: 11px;
+    font-size: 11px;
+  }
+
+  /* Dashboard rhythm */
+  .main > .grid {
+    gap: 15px !important;
+  }
+
+  .metrics {
+    position: relative;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .metrics::before {
+    content: "Sigue avanzando\A Cada entrenamiento te acerca a tu meta.";
+    grid-column: 1 / -1;
+    min-height: 128px;
+    display: flex;
+    align-items: center;
+    white-space: pre-line;
+    padding: 22px 22px 22px 88px;
+    border: 1px solid rgba(104, 131, 224, 0.28);
+    border-radius: 25px;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    background:
+      radial-gradient(circle at 12% 48%, rgba(57, 117, 255, 0.34) 0 32px, transparent 33px),
+      linear-gradient(160deg, rgba(17, 37, 72, 0.88), rgba(10, 24, 47, 0.86)),
+      linear-gradient(135deg, #0b1525, #10244f);
+    box-shadow:
+      0 22px 56px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .metrics::after {
+    content: "↗";
+    position: absolute;
+    left: 28px;
+    top: 38px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 17px;
+    color: #8bb3ff;
+    font-size: 25px;
+    font-weight: 900;
+    background: linear-gradient(145deg, rgba(41, 112, 255, 0.48), rgba(83, 88, 255, 0.20));
+    border: 1px solid rgba(113, 153, 255, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+  }
+
+  .metric {
+    position: relative;
+    min-height: 142px;
+    padding: 18px 16px 16px;
+    overflow: hidden;
+    border: 1px solid rgba(123, 145, 180, 0.14);
+    border-radius: 22px;
+    background:
+      linear-gradient(145deg, rgba(15, 29, 49, 0.96), rgba(8, 18, 31, 0.96));
+    box-shadow:
+      0 16px 38px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  }
+
+  .metric::after {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 31px;
+    height: 31px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  .metric:nth-child(1)::after {
+    content: "◎";
+    color: #6f9cff;
+    background: rgba(60, 110, 255, 0.14);
+  }
+  .metric:nth-child(2)::after {
+    content: "⌁";
+    color: #bb83ff;
+    background: rgba(145, 83, 255, 0.14);
+  }
+  .metric:nth-child(3)::after {
+    content: "↗";
+    color: #4aef88;
+    background: rgba(37, 214, 111, 0.13);
+  }
+  .metric:nth-child(4)::after {
+    content: "◷";
+    color: #ffad50;
+    background: rgba(255, 145, 43, 0.13);
+  }
+
+  .metric-label {
+    max-width: calc(100% - 32px);
+    color: #8f9eb3;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.005em;
+  }
+
+  .metric-value {
+    margin-top: 29px;
+    color: #fbfcff;
+    font-size: clamp(24px, 7.5vw, 31px);
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -0.055em;
+  }
+
+  .metric-help {
+    margin-top: 9px;
+    color: #8999af;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .two,
+  .equal,
+  .three {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .panel {
+    padding: 19px 17px 18px;
+    border: 1px solid rgba(129, 148, 181, 0.15);
+    border-radius: 25px;
+    background:
+      linear-gradient(145deg, rgba(12, 25, 42, 0.97), rgba(7, 16, 29, 0.98));
+    box-shadow:
+      0 20px 48px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .panel h2 {
+    color: #f6f9ff;
+    font-size: 20px;
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+  }
+
+  .panel-head { margin-bottom: 17px; }
+  .panel-sub {
+    margin-top: 7px;
+    color: #8798af;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .chart { height: 255px; margin-top: 2px; }
+  .chart.small { height: 225px; }
+
+  .recharts-cartesian-grid-horizontal line { stroke: rgba(141, 158, 184, 0.15); }
+  .recharts-cartesian-axis-tick text { fill: #8796aa; }
+
+  .chart-tooltip {
+    border: 1px solid rgba(130, 149, 181, 0.22);
+    background: rgba(9, 18, 31, 0.96);
+    color: #f7f9ff;
+    border-radius: 13px;
+    box-shadow: 0 16px 44px rgba(0,0,0,.32);
+    backdrop-filter: blur(18px);
+  }
+
+  .progress-track {
+    height: 10px;
+    background: rgba(64, 82, 106, 0.42);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,.25);
+  }
+
+  .progress-fill {
+    background: linear-gradient(90deg, #20d968, #4aef88);
+    box-shadow: 0 0 18px rgba(46, 232, 121, 0.20);
+  }
+
+  .road { gap: 8px; margin-top: 17px; }
+
+  .milestone {
+    padding: 8px 11px;
+    border: 1px solid rgba(126, 145, 176, 0.20);
+    background: rgba(7, 16, 29, 0.52);
+    color: #a3afbf;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .milestone.done {
+    border-color: rgba(46, 232, 121, 0.28);
+    background: rgba(18, 126, 66, 0.18);
+    color: #42ee83;
+  }
+
+  .insights { gap: 9px; }
+
+  .insight {
+    padding: 13px;
+    border-color: rgba(99, 128, 181, 0.15);
+    border-radius: 16px;
+    background: rgba(17, 34, 58, 0.58);
+    color: #dfe7f4;
+  }
+
+  .record-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .record {
+    border-color: rgba(127, 147, 178, 0.15);
+    border-radius: 18px;
+    background: rgba(9, 19, 33, 0.72);
+  }
+
+  .record b { color: #fff; }
+
+  /* Workout list */
+  .table-wrap { overflow: visible; }
+  .table { min-width: 0; }
+  .table thead { display: none; }
+  .table, .table tbody { display: block; width: 100%; }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    margin-bottom: 9px;
+    padding: 13px 14px;
+    border: 1px solid rgba(125, 145, 177, 0.13);
+    border-radius: 18px;
+    background: rgba(9, 20, 35, 0.72);
+  }
+
+  .table tr:last-child { margin-bottom: 0; }
+
+  .table td {
+    display: block;
+    min-width: 0;
+    padding: 2px 0;
+    border: 0;
+    color: #aab6c7;
+    font-size: 11px;
+  }
+
+  .table td:first-child {
+    grid-column: 1;
+    color: #f8fbff;
+    font-size: 13px;
+    font-weight: 850;
+  }
+
+  .table td:nth-child(2) { grid-column: 1; }
+
+  .table td:nth-child(3),
+  .table td:nth-child(4) {
+    grid-column: 2;
+    grid-row: auto;
+    text-align: right;
+    color: #eef3fb;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .table td:nth-child(n+5) { display: none; }
+  .clickable:hover { background: rgba(15, 30, 51, 0.86); }
+
+  .calendar { gap: 4px; }
+  .cal-head { color: #71829a; }
+
+  .day {
+    min-height: 72px;
+    padding: 6px;
+    border-color: rgba(127, 147, 178, 0.14);
+    border-radius: 13px;
+    background: rgba(8, 18, 31, 0.76);
+  }
+
+  .day-num { color: #8999af; }
+  .event { font-size: 8px; border-radius: 7px; }
+
+  /* iOS bottom-sheet modal */
+  .modal-backdrop {
+    display: grid;
+    place-items: end center;
+    padding: 0;
+    background: rgba(1, 5, 11, 0.64);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .modal {
+    width: min(100%, 520px);
+    max-height: 92svh;
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+    border: 1px solid rgba(137, 157, 190, 0.18);
+    border-bottom: 0;
+    border-radius: 30px 30px 0 0;
+    background: linear-gradient(180deg, #0e1929, #08111e);
+    box-shadow: 0 -22px 70px rgba(0,0,0,.48);
+  }
+
+  .modal::before {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 5px;
+    margin: -8px auto 18px;
+    border-radius: 999px;
+    background: #405169;
+  }
+
+  .modal h2 {
+    color: #fff;
+    font-size: 23px;
+    letter-spacing: -0.035em;
+  }
+
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .span2 { grid-column: auto; }
+
+  .field label { color: #8f9eb2; font-size: 11px; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    min-height: 46px;
+    border-color: rgba(130, 150, 181, 0.18);
+    border-radius: 14px;
+    background: #07101c;
+    color: #f8fbff;
+    outline: none;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: rgba(79, 124, 255, 0.62);
+    box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.11);
+  }
+
+  .preview {
+    border: 1px solid rgba(79, 124, 255, 0.18);
+    border-radius: 15px;
+    background: rgba(53, 92, 202, 0.11);
+    color: #82a4ff;
+  }
+
+  .modal-actions {
+    position: sticky;
+    bottom: -22px;
+    margin: 18px -18px -22px;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(127, 147, 179, 0.13);
+    background: rgba(7, 16, 28, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .btn {
+    min-height: 44px;
+    border-color: rgba(126, 146, 177, 0.18);
+    border-radius: 14px;
+    background: rgba(14, 27, 45, 0.92);
+    color: #f1f5fb;
+  }
+
+  .btn.primary {
+    border-color: rgba(88, 123, 255, 0.72);
+    background: linear-gradient(135deg, #3978ff, #6055ff);
+    box-shadow: 0 10px 24px rgba(55, 91, 255, 0.18);
+  }
+
+  .btn.danger { color: #ff767d; }
+
+  .exercise-row { grid-template-columns: 1fr 1fr; }
+  .exercise-row .field:first-child { grid-column: 1 / -1; }
+
+  /* Floating bottom nav */
+  .bottom-nav {
+    position: fixed;
+    z-index: 80;
+    left: 10px;
+    right: 10px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: min(calc(100% - 20px), 500px);
+    margin: 0 auto;
+    padding: 8px 8px 7px;
+    border: 1px solid rgba(130, 149, 181, 0.16);
+    border-radius: 26px;
+    background: rgba(7, 16, 29, 0.90);
+    box-shadow:
+      0 20px 60px rgba(0,0,0,.46),
+      inset 0 1px 0 rgba(255,255,255,.04);
+    backdrop-filter: blur(26px) saturate(150%);
+    -webkit-backdrop-filter: blur(26px) saturate(150%);
+  }
+
+  /* Camino a 21K remains visible on Inicio, so direct tab is hidden on iPhone */
+  .bottom-nav button:nth-child(5) { display: none; }
+
+  .bottom-nav button {
+    position: relative;
+    min-width: 0;
+    min-height: 54px;
+    padding: 5px 2px;
+    border: 0;
+    border-radius: 17px;
+    background: transparent;
+    color: #8190a5;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+  }
+
+  .bottom-nav button:nth-child(2) span { font-size: 0; }
+  .bottom-nav button:nth-child(2) span::after { content: "Entrenos"; font-size: 10px; }
+
+  .bottom-nav button svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 2;
+  }
+
+  .bottom-nav button.active {
+    color: #4e82ff;
+    background: rgba(42, 91, 205, 0.10);
+  }
+
+  .bottom-nav button.active::after {
+    content: "";
+    position: absolute;
+    left: 28%;
+    right: 28%;
+    bottom: 1px;
+    height: 2px;
+    border-radius: 99px;
+    background: #4f7cff;
+    box-shadow: 0 0 10px rgba(79, 124, 255, 0.45);
+  }
+
+  .bottom-nav button:active { transform: scale(.96); }
+
+  .hero-21 {
+    padding: 24px 19px;
+    border: 1px solid rgba(46, 232, 121, 0.18);
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 82% 10%, rgba(46, 232, 121, 0.12), transparent 18rem),
+      linear-gradient(145deg, rgba(11, 28, 42, 0.98), rgba(7, 17, 29, 0.98));
+  }
+
+  .hero-21 .big { font-size: 44px; color: #fff; }
+
+  @media (max-width: 390px) {
+    .main { padding-left: 13px; padding-right: 13px; }
+    .topbar h1::after { font-size: 27px; }
+    .topbar > div:first-child::after { font-size: 13px; }
+    .metric { min-height: 134px; padding: 16px 14px; }
+    .metric-value { font-size: 24px; }
+    .metrics::before { padding-left: 78px; font-size: 16px; }
+    .metrics::after { left: 24px; width: 43px; height: 43px; }
+  }
+}
