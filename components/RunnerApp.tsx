@@ -171,9 +171,9 @@ export default function RunnerApp(){
 
       <AuthBanner email={email} setEmail={setEmail} userEmail={userEmail} send={sendMagicLink} sync={cloudPull} syncMsg={syncMsg}/>
 
-      {view==='home' && <Dashboard data={data} runs={runs} weekly={weekly} longRuns={longRuns} longest={longest} progress={progress} daysLeft={daysLeft} thisWeek={thisWeek} prevWeek={prevWeek} last4={last4} recentPace={recentPace} insights={insights} projection={projection} projectionSource={projectionSource} openDetail={openDetail}/>}      
+      {view==='home' && <Dashboard runs={runs} weekly={weekly} longest={longest} progress={progress} daysLeft={daysLeft} thisWeek={thisWeek} prevWeek={prevWeek} last4={last4} recentPace={recentPace} openDetail={openDetail} goWorkouts={()=>setView('workouts')}/>}      
       {view==='workouts' && <WorkoutsView workouts={[...data.workouts].sort((a,b)=>b.date.localeCompare(a.date))} openEdit={openEdit} openDetail={openDetail} deleteWorkout={deleteWorkout}/>}      
-      {view==='progress' && <ProgressView runs={runs} weekly={weekly} longRuns={longRuns} rolling={rolling} records={records}/>}      
+      {view==='progress' && <ProgressView data={data} runs={runs} weekly={weekly} longRuns={longRuns} rolling={rolling} records={records} insights={insights} projection={projection} projectionSource={projectionSource}/>}      
       {view==='calendar' && <CalendarView workouts={data.workouts} openDetail={openDetail}/>}      
       {view==='road' && <RoadView profile={data.profile} longest={longest} projection={projection}/>}      
       {view==='profile' && <ProfileView data={data} setData={updateData} exportJson={exportJson} exportCsv={exportCsv} reset={()=>{if(confirm('¿Restaurar los datos demo?'))setData(resetDemo())}}/>}
@@ -192,13 +192,14 @@ function AuthBanner({email,setEmail,userEmail,send,sync,syncMsg}:any){
   </div>
 }
 
-function Dashboard({data,runs,weekly,longRuns,longest,progress,daysLeft,thisWeek,prevWeek,last4,recentPace,insights,projection,projectionSource,openDetail}:any){
-  const chartWeekly=weekly.slice(-12).map((x:any)=>({...x,label:weekLabel(x.week)}));
-  const chartLong=longRuns.slice(-10).map((x:any)=>({...x,label:weekLabel(x.week)}));
-  const paceData=[...runs].sort((a:Workout,b:Workout)=>a.date.localeCompare(b.date)).slice(-22).map((w:Workout)=>({date:shortDate(w.date),pace:+((paceSeconds(w.distance_km,w.duration_seconds)||0)/60).toFixed(2),type:typeLabels[w.workout_type]}));
-  const loadData=[...data.workouts].sort((a:Workout,b:Workout)=>a.date.localeCompare(b.date)).slice(-20).map((w:Workout)=>({date:shortDate(w.date),load:sessionLoad(w)}));
+function Dashboard({runs,weekly,longest,progress,daysLeft,thisWeek,prevWeek,last4,recentPace,openDetail,goWorkouts}:any){
+  const chartWeekly=weekly.slice(-10).map((x:any)=>({...x,label:weekLabel(x.week)}));
   const delta=prevWeek>0?((thisWeek-prevWeek)/prevWeek)*100:0;
-  return <div className="grid" style={{gap:18}}>
+  const milestones=[5,7,10,12,15,16,18,21.1];
+  const nextMilestone=milestones.find(m=>m>longest)??21.1;
+  const recent=[...runs].sort((a:Workout,b:Workout)=>b.date.localeCompare(a.date)).slice(0,3);
+
+  return <div className="grid home-dashboard" style={{gap:18}}>
     <section className="grid metrics">
       <Metric label="Objetivo" value="21,1 km" help={`Carrera en ${daysLeft} días`}/>
       <Metric label="Mayor fondo" value={`${longest.toFixed(1)} km`} help={`${progress.toFixed(0)}% de la distancia`}/>
@@ -206,38 +207,28 @@ function Dashboard({data,runs,weekly,longRuns,longest,progress,daysLeft,thisWeek
       <Metric label="Ritmo reciente" value={formatPace(recentPace)} help={`${last4.toFixed(1)} km en 28 días`}/>
     </section>
 
-    <section className="grid two">
+    <section className="grid two home-core">
       <Panel title="Kilómetros semanales" subtitle="Volumen de carrera de lunes a domingo">
-        <div className="chart"><ResponsiveContainer><BarChart data={chartWeekly}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" tick={{fontSize:11}}/><YAxis tick={{fontSize:11}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Kilómetros" fill="#2563eb" radius={[7,7,0,0]}/></BarChart></ResponsiveContainer></div>
+        <div className="chart"><ResponsiveContainer><BarChart data={chartWeekly}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" interval="preserveStartEnd" minTickGap={22} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Kilómetros" fill="#2563eb" radius={[7,7,0,0]}/></BarChart></ResponsiveContainer></div>
       </Panel>
+
       <Panel title="Camino a 21K" subtitle="Tu mayor distancia registrada">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'end',marginBottom:12}}><div><div style={{fontSize:40,fontWeight:950,letterSpacing:'-.06em'}}>{longest.toFixed(1)} km</div><div className="tiny">de 21,1 km</div></div><div style={{fontWeight:900,color:'var(--green)'}}>{progress.toFixed(0)}%</div></div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'end',marginBottom:12}}>
+          <div><div style={{fontSize:40,fontWeight:950,letterSpacing:'-.06em'}}>{longest.toFixed(1)} km</div><div className="tiny">de 21,1 km</div></div>
+          <div style={{fontWeight:900,color:'var(--green)'}}>{progress.toFixed(0)}%</div>
+        </div>
         <div className="progress-track"><div className="progress-fill" style={{width:`${progress}%`}}/></div>
-        <div className="road">{[5,7,10,12,15,16,18,21.1].map(x=><span key={x} className={`milestone ${longest>=x?'done':''}`}>{longest>=x?'✓':'○'} {x} km</span>)}</div>
+        <div className="road">{milestones.map(x=><span key={x} className={`milestone ${longest>=x?'done':''}`}>{longest>=x?'✓':'○'} {x} km</span>)}</div>
+        <div className="next-goal">
+          <span>Próximo objetivo</span>
+          <strong>{nextMilestone.toFixed(nextMilestone%1?1:0)} km</strong>
+          <small>Faltan {Math.max(0,nextMilestone-longest).toFixed(1)} km</small>
+        </div>
       </Panel>
     </section>
 
-    <section className="grid equal">
-      <Panel title="Fondo semanal" subtitle="La sesión más larga de cada semana">
-        <div className="chart small"><ResponsiveContainer><BarChart data={chartLong}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" tick={{fontSize:10}}/><YAxis domain={[0,22]} tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Fondo km" fill="#f97316" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div>
-      </Panel>
-      <Panel title="Evolución del ritmo" subtitle="Menos min/km = mayor velocidad">
-        <div className="chart small"><ResponsiveContainer><LineChart data={paceData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis reversed domain={['dataMin-0.2','dataMax+0.2']} tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Line type="monotone" dataKey="pace" name="min/km" stroke="#16a34a" strokeWidth={3} dot={false}/></LineChart></ResponsiveContainer></div>
-      </Panel>
-    </section>
-
-    <section className="grid equal">
-      <Panel title="Carga de entrenamiento" subtitle="Minutos × RPE. Tendencia descriptiva, no diagnóstico.">
-        <div className="chart small"><ResponsiveContainer><AreaChart data={loadData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Area type="monotone" dataKey="load" name="Carga" stroke="#7c3aed" fill="#7c3aed22" strokeWidth={2}/></AreaChart></ResponsiveContainer></div>
-      </Panel>
-      <Panel title="Lo que muestran tus datos" subtitle="Insights calculados a partir de tus registros">
-        <div className="insights">{insights.map((x:string,i:number)=><div className="insight" key={i}><Sparkles size={17} color="var(--blue)"/><span>{x}</span></div>)}</div>
-        {projection&&<div style={{marginTop:14,paddingTop:14,borderTop:'1px solid var(--line)'}}><div className="metric-label">Proyección 21,1 km</div><div className="metric-value" style={{fontSize:27}}>{formatDuration(projection)}</div><div className="metric-help">Basada en {projectionSource.distance_km.toFixed(1)} km recientes · ritmo requerido {formatPace(projection/HM_DISTANCE)}</div></div>}
-      </Panel>
-    </section>
-
-    <Panel title="Últimos entrenamientos" subtitle="Toca una actividad para ver el detalle y compararla">
-      <WorkoutTable workouts={[...runs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8)} onClick={openDetail}/>
+    <Panel title="Actividad reciente" subtitle="Tus últimos tres entrenamientos" right={<button className="text-action" onClick={goWorkouts}>Ver todos →</button>}>
+      <WorkoutTable workouts={recent} onClick={openDetail}/>
     </Panel>
   </div>
 }
@@ -256,20 +247,61 @@ function WorkoutsView({workouts,openEdit,openDetail,deleteWorkout}:any){
   return <div className="grid" style={{gap:16}}><Panel title="Historial de entrenamientos" subtitle={`${filtered.length} registros`} right={<div className="tabs"><button className={`chip ${filter==='all'?'active':''}`} onClick={()=>setFilter('all')}>Todos</button>{(['easy','tempo','intervals','long','gym','race'] as WorkoutType[]).map(t=><button key={t} className={`chip ${filter===t?'active':''}`} onClick={()=>setFilter(t)}>{typeLabels[t]}</button>)}</div>}><WorkoutTable workouts={filtered} onClick={openDetail} onEdit={openEdit} onDelete={deleteWorkout}/></Panel></div>
 }
 
-function ProgressView({runs,weekly,longRuns,rolling,records}:any){
+function ProgressView({data,runs,weekly,longRuns,rolling,records,insights,projection,projectionSource}:any){
   const [paceFilter,setPaceFilter]=useState<'all'|WorkoutType>('all');
-  const paceData=[...runs].filter((w:Workout)=>paceFilter==='all'||w.workout_type===paceFilter).sort((a:Workout,b:Workout)=>a.date.localeCompare(b.date)).map((w:Workout)=>({date:shortDate(w.date),pace:+((paceSeconds(w.distance_km,w.duration_seconds)||0)/60).toFixed(2)}));
-  const distribution=Object.entries(runs.reduce((m:any,w:Workout)=>{m[w.workout_type]=(m[w.workout_type]||0)+1;return m},{})).map(([name,value])=>({name:typeLabels[name as WorkoutType],value}));
+  const paceData=[...runs]
+    .filter((w:Workout)=>paceFilter==='all'||w.workout_type===paceFilter)
+    .sort((a:Workout,b:Workout)=>a.date.localeCompare(b.date))
+    .map((w:Workout)=>({date:shortDate(w.date),pace:+((paceSeconds(w.distance_km,w.duration_seconds)||0)/60).toFixed(2)}));
+
+  const distribution=Object.entries(runs.reduce((m:any,w:Workout)=>{
+    m[w.workout_type]=(m[w.workout_type]||0)+1;
+    return m
+  },{})).map(([name,value])=>({name:typeLabels[name as WorkoutType],value}));
+
   const colors=['#2563eb','#16a34a','#f97316','#7c3aed','#0ea5e9','#64748b'];
   const weeklyChart=weekly.map((x:any)=>({...x,label:weekLabel(x.week)}));
   const longChart=longRuns.map((x:any)=>({...x,label:weekLabel(x.week)}));
-  return <div className="grid" style={{gap:16}}>
-    <section className="grid equal"><Panel title="Promedio móvil de kilometraje" subtitle="Promedio diario de 7, 28 y 42 días"><div className="chart"><ResponsiveContainer><LineChart data={rolling}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tickFormatter={(v)=>shortDate(v)} minTickGap={28} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Line dataKey="ma7" name="7 días" stroke="#2563eb" dot={false}/><Line dataKey="ma28" name="28 días" stroke="#16a34a" dot={false}/><Line dataKey="ma42" name="42 días" stroke="#f97316" dot={false}/></LineChart></ResponsiveContainer></div></Panel>
-      <Panel title="Distribución del entrenamiento" subtitle="Porcentaje de sesiones de carrera"><div className="chart"><ResponsiveContainer><PieChart><Pie data={distribution} dataKey="value" nameKey="name" innerRadius={62} outerRadius={92} paddingAngle={3}>{distribution.map((_:any,i:number)=><Cell key={i} fill={colors[i%colors.length]}/>)}</Pie><Tooltip content={<TooltipCard/>}/><Legend/></PieChart></ResponsiveContainer></div></Panel></section>
-    <Panel title="Kilómetros por semana" subtitle="Tendencia del volumen total"><div className="chart"><ResponsiveContainer><AreaChart data={weeklyChart}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Area dataKey="km" name="km" stroke="#2563eb" fill="#2563eb22" strokeWidth={3}/></AreaChart></ResponsiveContainer></div></Panel>
-    <section className="grid equal"><Panel title="Evolución del ritmo" subtitle="Menos min/km representa mayor velocidad" right={<select className="chip" value={paceFilter} onChange={e=>setPaceFilter(e.target.value as any)}><option value="all">Todos</option>{(['easy','tempo','intervals','long','race'] as WorkoutType[]).map(t=><option key={t} value={t}>{typeLabels[t]}</option>)}</select>}><div className="chart"><ResponsiveContainer><LineChart data={paceData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" minTickGap={20} tick={{fontSize:10}}/><YAxis reversed tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Line dataKey="pace" name="min/km" stroke="#16a34a" strokeWidth={3} dot={false}/></LineChart></ResponsiveContainer></div></Panel>
-      <Panel title="Evolución del fondo" subtitle="Referencia visual: 21,1 km"><div className="chart"><ResponsiveContainer><BarChart data={longChart}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" tick={{fontSize:10}}/><YAxis domain={[0,22]} tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Fondo km" fill="#f97316" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div></Panel></section>
-    <Panel title="Curva de rendimiento por distancia" subtitle="Mejores equivalentes registrados a partir de tus actividades"><div className="record-grid">{records.curve.map((r:any)=><div className="record" key={r.distance}><span>{r.distance===HM_DISTANCE?'21,1':r.distance} km</span><b>{r.seconds?formatDuration(r.seconds):'—'}</b><span>{r.seconds?formatPace(r.seconds/r.distance):'Sin dato suficiente'}</span></div>)}</div></Panel>
+  const loadData=[...data.workouts]
+    .sort((a:Workout,b:Workout)=>a.date.localeCompare(b.date))
+    .slice(-28)
+    .map((w:Workout)=>({date:shortDate(w.date),load:sessionLoad(w)}));
+
+  return <div className="grid progress-dashboard" style={{gap:16}}>
+    <section className="grid equal">
+      <Panel title="Promedio móvil de kilometraje" subtitle="Promedio diario de 7, 28 y 42 días">
+        <div className="chart"><ResponsiveContainer><LineChart data={rolling}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tickFormatter={(v)=>shortDate(v)} minTickGap={28} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Line dataKey="ma7" name="7 días" stroke="#2563eb" dot={false}/><Line dataKey="ma28" name="28 días" stroke="#16a34a" dot={false}/><Line dataKey="ma42" name="42 días" stroke="#f97316" dot={false}/></LineChart></ResponsiveContainer></div>
+      </Panel>
+      <Panel title="Distribución del entrenamiento" subtitle="Porcentaje de sesiones de carrera">
+        <div className="chart"><ResponsiveContainer><PieChart><Pie data={distribution} dataKey="value" nameKey="name" innerRadius={62} outerRadius={92} paddingAngle={3}>{distribution.map((_:any,i:number)=><Cell key={i} fill={colors[i%colors.length]}/>)}</Pie><Tooltip content={<TooltipCard/>}/><Legend/></PieChart></ResponsiveContainer></div>
+      </Panel>
+    </section>
+
+    <Panel title="Kilómetros por semana" subtitle="Tendencia del volumen total">
+      <div className="chart"><ResponsiveContainer><AreaChart data={weeklyChart}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" minTickGap={24} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Area dataKey="km" name="km" stroke="#2563eb" fill="#2563eb22" strokeWidth={3}/></AreaChart></ResponsiveContainer></div>
+    </Panel>
+
+    <section className="grid equal">
+      <Panel title="Evolución del ritmo" subtitle="Menos min/km representa mayor velocidad" right={<select className="chip" value={paceFilter} onChange={e=>setPaceFilter(e.target.value as any)}><option value="all">Todos</option>{(['easy','tempo','intervals','long','race'] as WorkoutType[]).map(t=><option key={t} value={t}>{typeLabels[t]}</option>)}</select>}>
+        <div className="chart"><ResponsiveContainer><LineChart data={paceData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" minTickGap={24} tick={{fontSize:10}}/><YAxis reversed tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Line dataKey="pace" name="min/km" stroke="#16a34a" strokeWidth={3} dot={false}/></LineChart></ResponsiveContainer></div>
+      </Panel>
+      <Panel title="Evolución del fondo" subtitle="Referencia visual: 21,1 km">
+        <div className="chart"><ResponsiveContainer><BarChart data={longChart}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" minTickGap={24} tick={{fontSize:10}}/><YAxis domain={[0,22]} tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Fondo km" fill="#f97316" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div>
+      </Panel>
+    </section>
+
+    <Panel title="Carga de entrenamiento" subtitle="Minutos × RPE. Tendencia descriptiva, no diagnóstico.">
+      <div className="chart"><ResponsiveContainer><AreaChart data={loadData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" minTickGap={24} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Area type="monotone" dataKey="load" name="Carga" stroke="#7c3aed" fill="#7c3aed22" strokeWidth={2}/></AreaChart></ResponsiveContainer></div>
+    </Panel>
+
+    <Panel title="Lo que muestran tus datos" subtitle="Insights calculados a partir de tus registros">
+      <div className="insights">{insights.map((x:string,i:number)=><div className="insight" key={i}><Sparkles size={17} color="var(--blue)"/><span>{x}</span></div>)}</div>
+      {projection&&<div className="projection-card"><div className="metric-label">Proyección 21,1 km</div><div className="metric-value" style={{fontSize:29}}>{formatDuration(projection)}</div><div className="metric-help">Basada en {projectionSource.distance_km.toFixed(1)} km recientes · ritmo estimado {formatPace(projection/HM_DISTANCE)}</div><div className="projection-note">Estimación basada en tus resultados recientes; no es una garantía de rendimiento.</div></div>}
+    </Panel>
+
+    <Panel title="Curva de rendimiento por distancia" subtitle="Mejores equivalentes registrados a partir de tus actividades">
+      <div className="record-grid">{records.curve.map((r:any)=><div className="record" key={r.distance}><span>{r.distance===HM_DISTANCE?'21,1':r.distance} km</span><b>{r.seconds?formatDuration(r.seconds):'—'}</b><span>{r.seconds?formatPace(r.seconds/r.distance):'Sin dato suficiente'}</span></div>)}</div>
+    </Panel>
   </div>
 }
 
