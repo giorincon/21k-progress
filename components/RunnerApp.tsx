@@ -187,7 +187,7 @@ export default function RunnerApp(){
 
 function AuthBanner({email,setEmail,userEmail,send,sync,syncMsg}:any){
   return <div className="auth-banner">
-    <div><b>{userEmail?`Nube activa · ${userEmail}`:hasSupabase?'Modo local · inicia sesión para sincronizar':'Modo demo/local'}</b><div className="tiny">{hasSupabase?'Mismas actividades en todos tus dispositivos.':'El MVP funciona sin nube. Conecta Supabase cuando quieras sincronizar.'}</div></div>
+    <div><b>{userEmail?'● Sincronizado':hasSupabase?'● Local':'● Local'}</b><div className="tiny">{hasSupabase?'Mismas actividades en todos tus dispositivos.':'El MVP funciona sin nube. Conecta Supabase cuando quieras sincronizar.'}</div></div>
     <div className="actions">{hasSupabase && !userEmail && <><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Tu correo electrónico" type="email"/><button className="btn primary" onClick={send}><LogIn size={16}/> Enviar enlace</button></>}{userEmail&&<button className="btn" onClick={sync}>Sincronizar</button>}{syncMsg&&<span className="tiny" style={{alignSelf:'center'}}>{syncMsg}</span>}</div>
   </div>
 }
@@ -209,7 +209,9 @@ function Dashboard({runs,weekly,longest,progress,daysLeft,thisWeek,prevWeek,last
 
     <section className="grid two home-core">
       <Panel title="Kilómetros semanales" subtitle="Volumen de carrera de lunes a domingo">
-        <div className="chart"><ResponsiveContainer><BarChart data={chartWeekly}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" interval="preserveStartEnd" minTickGap={22} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Kilómetros" fill="#2563eb" radius={[7,7,0,0]}/></BarChart></ResponsiveContainer></div>
+        <div className="chart"><ResponsiveContainer><BarChart data={chartWeekly}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="label" interval="preserveStartEnd" minTickGap={22} tick={{fontSize:10}}/><YAxis tick={{fontSize:10}}/><Tooltip content={<TooltipCard/>}/><Bar dataKey="km" name="Kilómetros" radius={[7,7,0,0]}>
+          {chartWeekly.map((_:any,i:number)=><Cell key={i} fill={i===chartWeekly.length-1?'#6b63ff':'#3478f6'}/>)}
+        </Bar></BarChart></ResponsiveContainer></div>
       </Panel>
 
       <Panel title="Camino a 21K" subtitle="Tu mayor distancia registrada">
@@ -227,7 +229,7 @@ function Dashboard({runs,weekly,longest,progress,daysLeft,thisWeek,prevWeek,last
       </Panel>
     </section>
 
-    <Panel title="Actividad reciente" subtitle="Tus últimos tres entrenamientos" right={<button className="text-action" onClick={goWorkouts}>Ver todos →</button>}>
+    <Panel title="Actividad reciente" subtitle="Tus últimos tres entrenamientos" right={<button className="text-action" onClick={goWorkouts}>Ver todos <ChevronRight size={14}/></button>}>
       <WorkoutTable workouts={recent} onClick={openDetail}/>
     </Panel>
   </div>
