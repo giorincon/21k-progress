@@ -137,16 +137,33 @@ export function personalRecords(workouts: Workout[]) {
   }, null as Workout | null);
   const distances = [1, 3, 5, 10, 15, HM_DISTANCE];
   const curve = distances.map(d => {
-    const eligible = runs.filter(w => w.distance_km >= d * 0.95);
-    let best: {seconds: number; source: Workout} | null = null;
-    eligible.forEach(w => {
+  const eligible = runs.filter(w => w.distance_km >= d * 0.95);
+
+  const best = eligible.reduce<{ seconds: number; source: Workout } | null>(
+    (currentBest, w) => {
       const p = paceSeconds(w.distance_km, w.duration_seconds);
-      if (!p) return;
+
+      if (!p) return currentBest;
+
       const estimate = p * d;
-      if (!best || estimate < best.seconds) best = { seconds: estimate, source: w };
-    });
-    return { distance: d, seconds: best?.seconds ?? null };
-  });
+
+      if (!currentBest || estimate < currentBest.seconds) {
+        return {
+          seconds: estimate,
+          source: w
+        };
+      }
+
+      return currentBest;
+    },
+    null
+  );
+
+  return {
+    distance: d,
+    seconds: best ? best.seconds : null
+  };
+});
   const weekly = weeklyMileage(runs);
   const bestWeek = weekly.reduce((a, b) => !a || b.km > a.km ? b : a, null as {week: string; km: number} | null);
   return { longest, fastest, curve, bestWeek };
