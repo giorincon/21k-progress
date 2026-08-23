@@ -669,3 +669,117 @@
     .metrics::after { left: 24px; width: 43px; height: 43px; }
   }
 }
+
+
+/* 21K mobile v2 — shorter Home + analytics in Progress */
+@media (max-width: 760px) {
+  .auth-banner {
+    width: fit-content;
+    max-width: 100%;
+    margin-top: -8px;
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(12, 24, 41, 0.42);
+  }
+
+  .auth-banner:has(input) {
+    width: 100%;
+    border-radius: 16px;
+    padding: 10px 12px;
+  }
+
+  .auth-banner b {
+    font-size: 10px;
+    letter-spacing: .01em;
+  }
+
+  .home-dashboard {
+    gap: 14px !important;
+  }
+
+  .home-dashboard .home-core {
+    gap: 14px;
+  }
+
+  .home-dashboard .chart {
+    height: 230px;
+  }
+
+  .home-dashboard .panel:last-child .panel-head {
+    margin-bottom: 10px;
+  }
+
+  .text-action {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: #5f8cff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    padding: 6px 0 6px 10px;
+  }
+
+  .next-goal {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 12px;
+    align-items: end;
+    margin-top: 15px;
+    padding: 12px 13px;
+    border: 1px solid rgba(73, 119, 255, .16);
+    border-radius: 16px;
+    background: rgba(36, 73, 153, .10);
+  }
+
+  .next-goal span {
+    grid-column: 1;
+    color: #8394aa;
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .next-goal strong {
+    grid-column: 1;
+    color: #f8fbff;
+    font-size: 18px;
+    letter-spacing: -.025em;
+  }
+
+  .next-goal small {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    color: #58ed8d;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .projection-card {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(127, 147, 179, .13);
+  }
+
+  .projection-note {
+    margin-top: 9px;
+    color: #718198;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .progress-dashboard .panel {
+    scroll-margin-top: 10px;
+  }
+
+  .progress-dashboard .chart {
+    height: 235px;
+  }
+
+  .progress-dashboard .record-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
